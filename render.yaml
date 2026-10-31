@@ -1,0 +1,54 @@
+services:
+  - type: web
+    name: genetrader-backend
+    runtime: node
+    buildCommand: npm install --omit=dev
+    startCommand: node dist/index.js
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3100
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: COPIER_EVENT_INGEST_TOKEN
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: FIREBASE_CLIENT_EMAIL
+        sync: false
+      - key: FIREBASE_PRIVATE_KEY
+        sync: false
+      - key: MASTER_ACCOUNT_EMAIL
+        sync: false
+      - key: COPIER_SOURCE_MONITOR_EMAIL
+        sync: false
+      - key: BINANCE_API_KEY
+        sync: false
+      - key: BINANCE_API_SECRET
+        sync: false
+      - key: BINANCE_TESTNET
+        sync: false
+      - key: ENCRYPTION_KEY
+        sync: false
+      - key: SKIP_BINANCE_VALIDATION
+        sync: false
+      - key: ACCESS_REQUEST_CONSENT_VERSION
+        sync: false
+      - key: OBSERVER_CONSENT_VERSION
+        sync: false
+      - key: BACKEND_PUBLIC_URL
+        sync: false
+      - key: ANDROID_UPDATE_VERSION
+        sync: false
+      - key: ANDROID_UPDATE_SHA256
+        sync: false
+      - key: ANDROID_UPDATE_RELEASE_NOTES
+        sync: false

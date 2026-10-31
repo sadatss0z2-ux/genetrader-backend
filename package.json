@@ -1,0 +1,13 @@
+{
+  "name": "genetrader-backend",
+  "version": "1.0.0",
+  "description": "GeneTrader Backend API",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "node dist/index.js",
+    "build": "echo 'pre-built'"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
