@@ -147,5 +147,43 @@ router.get('/decisions', async (req, res, next) => {
         next(err);
     }
 });
+// ── GET /api/public/open-trades ──────────────────────────────────────────────
+router.get('/open-trades', async (req, res, next) => {
+    try {
+        const latest = await getLatestInstance();
+        if (!latest) {
+            res.json({ count: 0, source_trades: [], open_trades: [] });
+            return;
+        }
+        const [sourceRows, portfolioRows] = await Promise.all([
+            (0, database_1.default) `
+              SELECT master_trade_id, pair, stake_amount, profit_ratio, observed_at
+              FROM copier_source_open_trades
+              WHERE instance_id = ${latest.instanceId}
+            `,
+            (0, database_1.default) `
+              SELECT record FROM copier_portfolio_trades
+              WHERE instance_id = ${latest.instanceId} AND is_open = TRUE
+              ORDER BY open_date::timestamptz DESC
+            `
+        ]);
+        const sourceTrades = sourceRows.map((r) => ({
+            master_trade_id: r.master_trade_id,
+            pair: r.pair,
+            stake_amount: finiteNumber(r.stake_amount) ?? 0,
+            profit_ratio: finiteNumber(r.profit_ratio) ?? 0,
+            observed_at: r.observed_at
+        }));
+        const portfolioTrades = portfolioRows.map((r) => r.record);
+        res.json({
+            count: sourceTrades.length + portfolioTrades.length,
+            source_trades: sourceTrades,
+            open_trades: portfolioTrades
+        });
+    }
+    catch (err) {
+        next(err);
+    }
+});
 exports.default = router;
 //# sourceMappingURL=public.js.map
