@@ -1,0 +1,6 @@
+{
+  "version": "1.0.15",
+  "sha256": "d722beaab7dbe3394e1d339e5b8abe3effbf33394c984f2f2eb2cf0bd3258c12",
+  "releaseNotes": "Live buy/sell real-time chart markers and price lines on open trades, Gen12 algorithmic intelligence trace without mock data, and performance optimizations.",
+  "forceUpdate": false
+}

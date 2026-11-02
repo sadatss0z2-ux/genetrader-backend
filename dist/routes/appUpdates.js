@@ -36,6 +36,42 @@ function isAllowedApkUrl(u) {
         return PRIVATE_HOST_RE.test(u.hostname);
     return false;
 }
+
+function getEffectiveReleaseMetadata() {
+    const releaseManifestPath = path_1.default.join(process.cwd(), 'assets', 'release.json');
+    let releaseManifest = null;
+    if (fs_1.default.existsSync(releaseManifestPath)) {
+        try {
+            releaseManifest = JSON.parse(fs_1.default.readFileSync(releaseManifestPath, 'utf8'));
+        } catch (e) {
+            console.error('[AppUpdates] Failed to parse assets/release.json', e);
+        }
+    }
+    const envVersion = process.env.ANDROID_UPDATE_VERSION?.trim();
+    const bundledVersion = releaseManifest?.version?.trim();
+    let version = envVersion;
+    if (bundledVersion) {
+        if (!envVersion) {
+            version = bundledVersion;
+        } else {
+            const bParts = parseVersion(bundledVersion);
+            const eParts = parseVersion(envVersion);
+            if (bParts && (!eParts || compareVersions(bParts, eParts) > 0)) {
+                version = bundledVersion;
+            }
+        }
+    }
+    const isBundled = version === bundledVersion;
+    const sha256 = (isBundled && releaseManifest?.sha256)
+        ? releaseManifest.sha256.trim()
+        : process.env.ANDROID_UPDATE_SHA256?.trim();
+    const releaseNotes = (isBundled && releaseManifest?.releaseNotes)
+        ? releaseManifest.releaseNotes.trim()
+        : (process.env.ANDROID_UPDATE_RELEASE_NOTES?.trim() ?? '');
+    const forceBelowVersion = process.env.ANDROID_UPDATE_FORCE_BELOW_VERSION?.trim();
+    return { version, sha256, releaseNotes, forceBelowVersion };
+}
+
 // ── GET /api/app-updates/android — version manifest ─────────────────────────
 router.get('/android', (req, res) => {
     dotenv_1.default.config({ override: true });
@@ -48,10 +84,7 @@ router.get('/android', (req, res) => {
         res.status(400).json({ error: 'A valid currentVersion in major.minor.patch format is required.' });
         return;
     }
-    const version = process.env.ANDROID_UPDATE_VERSION?.trim();
-    const sha256 = process.env.ANDROID_UPDATE_SHA256?.trim();
-    const releaseNotes = process.env.ANDROID_UPDATE_RELEASE_NOTES?.trim() ?? '';
-    const forceBelowVersion = process.env.ANDROID_UPDATE_FORCE_BELOW_VERSION?.trim();
+    const { version, sha256, releaseNotes, forceBelowVersion } = getEffectiveReleaseMetadata();
     // Resolve APK URL: explicit env var takes priority, otherwise auto-generate
     // a self-hosted URL from the backend's public base URL.
     const apkUrlRaw = (() => {
@@ -112,7 +145,8 @@ router.get('/android', (req, res) => {
 // artifact keeps OTA updates available on immutable hosts such as Render.
 router.get('/android/download', (req, res) => {
     dotenv_1.default.config({ override: true });
-    const versionSlug = (process.env.ANDROID_UPDATE_VERSION?.trim() ?? 'latest').replace(/[^a-z0-9._-]/gi, '_');
+    const { version: effectiveVersion } = getEffectiveReleaseMetadata();
+    const versionSlug = (effectiveVersion ?? process.env.ANDROID_UPDATE_VERSION?.trim() ?? 'latest').replace(/[^a-z0-9._-]/gi, '_');
     const apkPath = process.env.ANDROID_UPDATE_APK_PATH?.trim()
         ?? path_1.default.join(process.cwd(), 'assets', `GeneTrader-${versionSlug}-production-debug.apk`);
     // Resolve to an absolute path and guard against directory traversal.
