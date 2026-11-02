@@ -1,6 +1,6 @@
 {
-  "version": "1.0.15",
-  "sha256": "d722beaab7dbe3394e1d339e5b8abe3effbf33394c984f2f2eb2cf0bd3258c12",
-  "releaseNotes": "Live buy/sell real-time chart markers and price lines on open trades, Gen12 algorithmic intelligence trace without mock data, and performance optimizations.",
+  "version": "1.0.16",
+  "sha256": "923bb856a16421c6ca377a32910d054d3173e9598fdcc99b4f64da6c8d1e27da",
+  "releaseNotes": "Crisp anti-aliased chart indicators, high-contrast hardware-accelerated price line badges, and smooth vector candle markers.",
   "forceUpdate": false
 }
