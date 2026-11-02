@@ -108,14 +108,13 @@ router.get('/android', (req, res) => {
     });
 });
 // ── GET /api/app-updates/android/download — serves the APK file ─────────────
-// Enabled only when ANDROID_UPDATE_APK_PATH is set to an absolute file path.
+// A service-level path can override the bundled release artifact.  The bundled
+// artifact keeps OTA updates available on immutable hosts such as Render.
 router.get('/android/download', (req, res) => {
     dotenv_1.default.config({ override: true });
-    const apkPath = process.env.ANDROID_UPDATE_APK_PATH?.trim();
-    if (!apkPath) {
-        res.status(404).json({ error: 'Self-hosted APK download is not configured on this server.' });
-        return;
-    }
+    const versionSlug = (process.env.ANDROID_UPDATE_VERSION?.trim() ?? 'latest').replace(/[^a-z0-9._-]/gi, '_');
+    const apkPath = process.env.ANDROID_UPDATE_APK_PATH?.trim()
+        ?? path_1.default.join(process.cwd(), 'assets', `GeneTrader-${versionSlug}-production-debug.apk`);
     // Resolve to an absolute path and guard against directory traversal.
     const resolved = path_1.default.resolve(apkPath);
     if (resolved !== apkPath && !resolved.startsWith(path_1.default.resolve(path_1.default.dirname(apkPath)))) {
@@ -129,7 +128,6 @@ router.get('/android/download', (req, res) => {
         return;
     }
     const stat = fs_1.default.statSync(resolved);
-    const versionSlug = (process.env.ANDROID_UPDATE_VERSION?.trim() ?? 'latest').replace(/[^a-z0-9._-]/gi, '_');
     const fileName = `GeneTrader-${versionSlug}.apk`;
     res.set({
         'Content-Type': 'application/vnd.android.package-archive',
