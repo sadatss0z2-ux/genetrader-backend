@@ -538,6 +538,12 @@ async function getManagedLiveAccountInfo(userId) {
     };
 }
 async function getAccountInfo(userId, environment = 'testnet') {
+    // Operator-managed accounts are intentionally read from the remote copier.
+    // Do this before touching personal credentials: these accounts do not keep
+    // a local exchange key and must never depend on one to render a balance.
+    const managed = await getManagedLiveAccountInfo(userId);
+    if (managed)
+        return managed;
     try {
         const account = await (await createUserClient(userId, environment)).account();
         return {
