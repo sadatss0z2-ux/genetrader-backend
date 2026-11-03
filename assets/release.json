@@ -1,6 +1,6 @@
 {
   "version": "1.0.23",
-  "sha256": "fbfcd6b6f90f1a39bb59e4bbc55b998afe6b2f285baed2d315a0c160900eb96d",
+  "sha256": "4ba5d906f4e91fa4be931c793aaae82013a9802ccd1ab8507835a484fc69d329",
   "releaseNotes": "Performance: Chart engine now uses incremental series.update() on streaming ticks instead of full setData() on every WebSocket kline — eliminates O(n) redraws on 500+ candle arrays. Indicator updates (EMA/MA/BOLL/RSI) are now O(1) per tick. Reduces device temperature and GPU load during live chart streaming.",
   "forceUpdate": false
 }
