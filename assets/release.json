@@ -1,6 +1,6 @@
 {
-  "version": "1.0.16",
-  "sha256": "923bb856a16421c6ca377a32910d054d3173e9598fdcc99b4f64da6c8d1e27da",
-  "releaseNotes": "Crisp anti-aliased chart indicators, high-contrast hardware-accelerated price line badges, and smooth vector candle markers.",
+  "version": "1.0.17",
+  "sha256": "87fc9a0881dd0dc2ba25faa1885c1f72729576532b254f14008c1f2653153c90",
+  "releaseNotes": "Live master-overseer balance, P&L, activity and alerts now preload at sign-in. Markets open instantly from a warmed live directory, and Android notification permission and FCM registration are made reliable.",
   "forceUpdate": false
 }
