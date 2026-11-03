@@ -1,6 +1,6 @@
 {
-  "version": "1.0.21",
-  "sha256": "de03f224ee7039f8829a6fdac02a6a040773919f2bd4ffa9e0a80cb8553090dc",
-  "releaseNotes": "Chart trade marks (BUY entry and SELL close) now persist after trade closes. Real-time live PnL calculated with precision (% and USDT) on position banner. Watchlist coin prices now truncate rather than round.",
+  "version": "1.0.22",
+  "sha256": "bb2ed5012541d4eb5be746ca4140c14737cdf8f73c861511505cc353666a9418",
+  "releaseNotes": "Comprehensive system update: Hardware Back button navigation hierarchy fixed across notifications, news, sub-drawers and fullscreen chart; WebSocket exponential reconnect restored on disconnection blips; minNotional order validation enforced; USDT quote balances formatted to 2dp; dynamic live RSI, Bollinger %B, and EMA trend calculations in Market Intelligence; managed live account trade history hydrated on Account tab; live algorithmic capital vetoes populated in Activity feed; Telegram markdown cleanly formatted; and accounts.genetrader.site deep linking added.",
   "forceUpdate": false
 }
