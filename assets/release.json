@@ -1,6 +1,6 @@
 {
-  "version": "1.0.18",
-  "sha256": "d26fd87277fd40b75bddf3d6a7b9c99ac3811e34b8911f214c136bdf41b95f22",
-  "releaseNotes": "Fixes the Android startup crash during Firebase Cloud Messaging registration. Live master-overseer balance, P&L, activity, notifications, and warmed Markets data continue to load from the online service.",
+  "version": "1.0.20",
+  "sha256": "79366c700907520e4c8b9353677591a6054325ccd45a3bc3eb8961a774030d87",
+  "releaseNotes": "Managed operator accounts now show their live remote copier balance, position values, activity, and alerts. Trade retains live markets while disabling manual execution. Includes the Firebase startup and notification-permission fixes.",
   "forceUpdate": false
 }
