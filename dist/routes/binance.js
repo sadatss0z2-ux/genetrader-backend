@@ -95,6 +95,16 @@ router.get('/account', auth_1.requireAuth, async (req, res, next) => {
         next(err);
     }
 });
+// Operator-managed accounts do not expose or depend on a personal exchange
+// credential. Their read-only portfolio is supplied by the remote copier.
+router.get('/managed-account', auth_1.requireAuth, async (req, res, next) => {
+    try {
+        res.json(await (0, binanceService_1.getManagedLiveAccountOverview)(req.user.userId));
+    }
+    catch (err) {
+        next(err);
+    }
+});
 router.post('/order/market', auth_1.requireAuth, async (req, res, next) => {
     try {
         const { symbol, side, quantity } = req.body;

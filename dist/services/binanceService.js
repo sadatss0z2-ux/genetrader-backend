@@ -18,6 +18,7 @@ exports.get24hTicker = get24hTicker;
 exports.get24hTickers = get24hTickers;
 exports.getAllSpotPairs = getAllSpotPairs;
 exports.getKlines = getKlines;
+exports.getManagedLiveAccountOverview = getManagedLiveAccountOverview;
 exports.getAccountInfo = getAccountInfo;
 exports.syncUserTradesFromBinance = syncUserTradesFromBinance;
 exports.placeMarketOrder = placeMarketOrder;
@@ -461,9 +462,15 @@ async function getKlines(symbol, interval = '1h', limit = 100) {
         quoteVolume: numberFrom(candle.quoteVolume ?? candle.quoteAssetVolume, 'kline quote volume'),
     }));
 }
-async function getManagedLiveAccountInfo(userId) {
+async function getManagedLiveAccountOverview(userId) {
     const rows = await (0, database_1.default) `
-    SELECT portfolio.balance_usdt, portfolio.stats, portfolio.observed_at
+    SELECT
+      managed.account_ref,
+      managed.account_kind,
+      portfolio.balance_usdt,
+      portfolio.initial_balance_usdt,
+      portfolio.stats,
+      portfolio.observed_at
     FROM operator_managed_live_accounts managed
     JOIN copier_portfolio_accounts portfolio
       ON portfolio.instance_id = managed.instance_id
@@ -473,26 +480,61 @@ async function getManagedLiveAccountInfo(userId) {
       AND managed.requested_live = TRUE
       AND portfolio.enabled = TRUE
       AND portfolio.dry_run = FALSE
-      AND portfolio.observed_at >= NOW() - INTERVAL '2 minutes'
     ORDER BY portfolio.observed_at DESC
     LIMIT 1
   `;
     const row = rows[0];
-    if (!row)
-        return null;
+    if (!row) {
+        return { managed: false };
+    }
     const free = Number(row.balance_usdt);
     const locked = Number(row.stats?.open_stake_usdt ?? 0);
-    if (!Number.isFinite(free) || free < 0 || !Number.isFinite(locked) || locked < 0) {
+    const initialBalance = Number(row.initial_balance_usdt);
+    const totalProfit = Number(row.stats?.total_profit_usdt ?? 0);
+    const totalTrades = Number(row.stats?.total_trades ?? 0);
+    const openTrades = Number(row.stats?.open_trades ?? 0);
+    const observedAt = new Date(row.observed_at);
+    const validSnapshot = Number.isFinite(free) && free >= 0
+        && Number.isFinite(locked) && locked >= 0
+        && !Number.isNaN(observedAt.getTime());
+    if (!validSnapshot) {
+        return { managed: true, online: false, accountName: row.account_ref };
+    }
+    return {
+        managed: true,
+        // The copier reports a fresh snapshot at least once per minute. A
+        // bounded five-minute window tolerates a short network retry without
+        // presenting an old balance as live.
+        online: Date.now() - observedAt.getTime() <= 5 * 60 * 1000,
+        accountName: row.account_ref,
+        accountKind: row.account_kind,
+        balanceUsdt: free,
+        portfolioValueUsdt: Number((free + locked).toFixed(8)),
+        initialBalanceUsdt: Number.isFinite(initialBalance) ? initialBalance : null,
+        realizedProfitUsdt: Number.isFinite(totalProfit) ? totalProfit : null,
+        totalTrades: Number.isFinite(totalTrades) ? totalTrades : null,
+        openTrades: Number.isFinite(openTrades) ? openTrades : null,
+        connectionStatus: typeof row.stats?.connection_status === 'string' ? row.stats.connection_status : null,
+        observedAt: observedAt.toISOString(),
+    };
+}
+async function getManagedLiveAccountInfo(userId) {
+    const managed = await getManagedLiveAccountOverview(userId);
+    if (!managed.managed || !managed.online
+        || typeof managed.balanceUsdt !== 'number'
+        || typeof managed.portfolioValueUsdt !== 'number'
+        || typeof managed.observedAt !== 'string') {
         return null;
     }
     return {
         balances: {
             USDT: {
-                free: free.toFixed(8),
-                locked: locked.toFixed(8),
+                free: managed.balanceUsdt.toFixed(8),
+                locked: (managed.portfolioValueUsdt - managed.balanceUsdt).toFixed(8),
             },
         },
-        updateTime: new Date(row.observed_at).getTime(),
+        updateTime: new Date(managed.observedAt).getTime(),
+        managedAccount: managed,
     };
 }
 async function getAccountInfo(userId, environment = 'testnet') {
@@ -507,7 +549,7 @@ async function getAccountInfo(userId, environment = 'testnet') {
         };
     }
     catch (error) {
-        if (environment === 'live' && error instanceof ExchangeConnectionUnavailableError) {
+        if (error instanceof ExchangeConnectionUnavailableError) {
             const managed = await getManagedLiveAccountInfo(userId);
             if (managed)
                 return managed;

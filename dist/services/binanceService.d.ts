@@ -102,6 +102,21 @@ export interface AccountInfo {
         locked: string;
     }>;
     updateTime: number;
+    managedAccount?: ManagedLiveAccountOverview;
+}
+export interface ManagedLiveAccountOverview {
+    managed: boolean;
+    online?: boolean;
+    accountName?: string;
+    accountKind?: string;
+    balanceUsdt?: number;
+    portfolioValueUsdt?: number;
+    initialBalanceUsdt?: number | null;
+    realizedProfitUsdt?: number | null;
+    totalTrades?: number | null;
+    openTrades?: number | null;
+    connectionStatus?: string | null;
+    observedAt?: string;
 }
 export interface Order {
     symbol: string;
@@ -121,6 +136,7 @@ export declare function get24hTicker(symbol: string): Promise<Ticker>;
 export declare function get24hTickers(): Promise<BinanceTicker24h[]>;
 export declare function getAllSpotPairs(): Promise<BinanceExchangeInfo[]>;
 export declare function getKlines(symbol: string, interval?: string, limit?: number): Promise<Kline[]>;
+export declare function getManagedLiveAccountOverview(userId: number): Promise<ManagedLiveAccountOverview>;
 export declare function getAccountInfo(userId: number, environment?: ExchangeEnvironment): Promise<AccountInfo>;
 export declare function syncUserTradesFromBinance(userId: number, symbol?: string): Promise<void>;
 export declare function placeMarketOrder(symbol: string, side: 'BUY' | 'SELL', quantity: number, userId: number): Promise<Order>;
