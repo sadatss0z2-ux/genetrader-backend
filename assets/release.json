@@ -1,6 +1,6 @@
 {
-  "version": "1.0.17",
-  "sha256": "87fc9a0881dd0dc2ba25faa1885c1f72729576532b254f14008c1f2653153c90",
-  "releaseNotes": "Live master-overseer balance, P&L, activity and alerts now preload at sign-in. Markets open instantly from a warmed live directory, and Android notification permission and FCM registration are made reliable.",
+  "version": "1.0.18",
+  "sha256": "d26fd87277fd40b75bddf3d6a7b9c99ac3811e34b8911f214c136bdf41b95f22",
+  "releaseNotes": "Fixes the Android startup crash during Firebase Cloud Messaging registration. Live master-overseer balance, P&L, activity, notifications, and warmed Markets data continue to load from the online service.",
   "forceUpdate": false
 }
