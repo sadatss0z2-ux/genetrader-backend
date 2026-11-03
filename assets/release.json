@@ -1,6 +1,6 @@
 {
-  "version": "1.0.22",
-  "sha256": "bb2ed5012541d4eb5be746ca4140c14737cdf8f73c861511505cc353666a9418",
-  "releaseNotes": "Comprehensive system update: Hardware Back button navigation hierarchy fixed across notifications, news, sub-drawers and fullscreen chart; WebSocket exponential reconnect restored on disconnection blips; minNotional order validation enforced; USDT quote balances formatted to 2dp; dynamic live RSI, Bollinger %B, and EMA trend calculations in Market Intelligence; managed live account trade history hydrated on Account tab; live algorithmic capital vetoes populated in Activity feed; Telegram markdown cleanly formatted; and accounts.genetrader.site deep linking added.",
+  "version": "1.0.23",
+  "sha256": "fbfcd6b6f90f1a39bb59e4bbc55b998afe6b2f285baed2d315a0c160900eb96d",
+  "releaseNotes": "Performance: Chart engine now uses incremental series.update() on streaming ticks instead of full setData() on every WebSocket kline — eliminates O(n) redraws on 500+ candle arrays. Indicator updates (EMA/MA/BOLL/RSI) are now O(1) per tick. Reduces device temperature and GPU load during live chart streaming.",
   "forceUpdate": false
 }
