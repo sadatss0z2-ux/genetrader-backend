@@ -1,6 +1,6 @@
 {
-  "version": "1.0.20",
-  "sha256": "79366c700907520e4c8b9353677591a6054325ccd45a3bc3eb8961a774030d87",
-  "releaseNotes": "Managed operator accounts now show their live remote copier balance, position values, activity, and alerts. Trade retains live markets while disabling manual execution. Includes the Firebase startup and notification-permission fixes.",
+  "version": "1.0.21",
+  "sha256": "de03f224ee7039f8829a6fdac02a6a040773919f2bd4ffa9e0a80cb8553090dc",
+  "releaseNotes": "Chart trade marks (BUY entry and SELL close) now persist after trade closes. Real-time live PnL calculated with precision (% and USDT) on position banner. Watchlist coin prices now truncate rather than round.",
   "forceUpdate": false
 }
