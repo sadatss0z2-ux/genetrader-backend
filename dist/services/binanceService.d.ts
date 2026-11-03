@@ -137,6 +137,10 @@ export declare function get24hTickers(): Promise<BinanceTicker24h[]>;
 export declare function getAllSpotPairs(): Promise<BinanceExchangeInfo[]>;
 export declare function getKlines(symbol: string, interval?: string, limit?: number): Promise<Kline[]>;
 export declare function getManagedLiveAccountOverview(userId: number): Promise<ManagedLiveAccountOverview>;
+export declare function getManagedLiveAccountTrades(userId: number, limit?: number): Promise<{
+    managed: boolean;
+    trades: Array<Record<string, unknown>>;
+}>;
 export declare function getAccountInfo(userId: number, environment?: ExchangeEnvironment): Promise<AccountInfo>;
 export declare function syncUserTradesFromBinance(userId: number, symbol?: string): Promise<void>;
 export declare function placeMarketOrder(symbol: string, side: 'BUY' | 'SELL', quantity: number, userId: number): Promise<Order>;

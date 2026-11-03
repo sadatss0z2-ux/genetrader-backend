@@ -105,6 +105,16 @@ router.get('/managed-account', auth_1.requireAuth, async (req, res, next) => {
         next(err);
     }
 });
+router.get('/managed-account/trades', auth_1.requireAuth, async (req, res, next) => {
+    try {
+        const requested = typeof req.query.limit === 'string' ? Number(req.query.limit) : 50;
+        const limit = Number.isSafeInteger(requested) ? Math.min(Math.max(requested, 1), 50) : 50;
+        res.json(await (0, binanceService_1.getManagedLiveAccountTrades)(req.user.userId, limit));
+    }
+    catch (err) {
+        next(err);
+    }
+});
 router.post('/order/market', auth_1.requireAuth, async (req, res, next) => {
     try {
         const { symbol, side, quantity } = req.body;

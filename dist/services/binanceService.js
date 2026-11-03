@@ -19,6 +19,7 @@ exports.get24hTickers = get24hTickers;
 exports.getAllSpotPairs = getAllSpotPairs;
 exports.getKlines = getKlines;
 exports.getManagedLiveAccountOverview = getManagedLiveAccountOverview;
+exports.getManagedLiveAccountTrades = getManagedLiveAccountTrades;
 exports.getAccountInfo = getAccountInfo;
 exports.syncUserTradesFromBinance = syncUserTradesFromBinance;
 exports.placeMarketOrder = placeMarketOrder;
@@ -536,6 +537,57 @@ async function getManagedLiveAccountInfo(userId) {
         updateTime: new Date(managed.observedAt).getTime(),
         managedAccount: managed,
     };
+}
+async function getManagedLiveAccountTrades(userId, limit = 50) {
+    const safeLimit = Number.isSafeInteger(limit) ? Math.min(Math.max(limit, 1), 50) : 50;
+    const managedRows = await (0, database_1.default) `
+    SELECT managed.instance_id, managed.account_ref, managed.account_kind
+    FROM operator_managed_live_accounts managed
+    JOIN copier_instances instance ON instance.instance_id = managed.instance_id
+      AND instance.enabled = TRUE
+    WHERE managed.user_id = ${userId}
+      AND managed.active = TRUE
+      AND managed.requested_live = TRUE
+    LIMIT 1
+  `;
+    const managed = managedRows[0];
+    if (!managed)
+        return { managed: false, trades: [] };
+    if (managed.account_kind === 'SOURCE') {
+        const sourceRows = await (0, database_1.default) `
+      SELECT master_trade_id, pair, stake_amount, profit_ratio, observed_at
+      FROM copier_source_open_trades
+      WHERE instance_id = ${managed.instance_id}
+      ORDER BY observed_at DESC, master_trade_id DESC
+      LIMIT ${safeLimit}
+    `;
+        return {
+            managed: true,
+            trades: sourceRows.map((trade) => ({
+                id: `source-${trade.master_trade_id}`,
+                account_name: managed.account_ref,
+                pair: trade.pair,
+                side: 'LONG',
+                is_short: false,
+                is_open: true,
+                open_date: trade.observed_at.toISOString(),
+                open_rate: null,
+                stake_amount: Number(trade.stake_amount),
+                close_profit: Number(trade.profit_ratio),
+                close_profit_abs: 0,
+                strategy: 'Hosted source copier',
+            })),
+        };
+    }
+    const rows = await (0, database_1.default) `
+    SELECT record
+    FROM copier_portfolio_trades
+    WHERE instance_id = ${managed.instance_id}
+      AND account_name = ${managed.account_ref}
+    ORDER BY open_date::timestamptz DESC NULLS LAST, trade_id DESC
+    LIMIT ${safeLimit}
+  `;
+    return { managed: true, trades: rows.map((row) => row.record) };
 }
 async function getAccountInfo(userId, environment = 'testnet') {
     // Operator-managed accounts are intentionally read from the remote copier.
