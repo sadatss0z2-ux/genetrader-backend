@@ -1,6 +1,6 @@
 {
-  "version": "1.0.23",
-  "sha256": "4ba5d906f4e91fa4be931c793aaae82013a9802ccd1ab8507835a484fc69d329",
-  "releaseNotes": "Performance: Chart engine now uses incremental series.update() on streaming ticks instead of full setData() on every WebSocket kline — eliminates O(n) redraws on 500+ candle arrays. Indicator updates (EMA/MA/BOLL/RSI) are now O(1) per tick. Reduces device temperature and GPU load during live chart streaming.",
+  "version": "1.0.24",
+  "sha256": "0dc2fba5fab41dd2f3a86a6231abf88a4490972e7e168788f400121270b11582",
+  "releaseNotes": "Audit Implementation: P4-04 Veto Center & Why Decision Sheet server integration. Removed all hardcoded counters and fabricated fallbacks; wired live decision candidates, regime classifications, dynamic category cards (Volatility, Exposure, Regime, Liquidity), full modal accessibility with aria-modal/aria-expanded, and manual refresh triggers.",
   "forceUpdate": false
 }
