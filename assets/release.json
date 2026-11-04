@@ -1,6 +1,6 @@
 {
-  "version": "1.0.26",
-  "sha256": "442118311858dabfa2fed0e04248e54855fc18a1283cc49b3f874ac2b52bb1d6",
-  "releaseNotes": "Design System Audit Remediation: Enforce 48dp stepper & nav touch targets, eliminate fabricated watchlist fallbacks & fake sparkline drop-shadows, add Android safe-area insets, explicit search/profile input a11y labels, and profile save spinner.",
+  "version": "1.0.27",
+  "sha256": "0cadbb2279d2588099a0c4174f2f09096f95ffbf5b2c06dc1b0891f757653ce3",
+  "releaseNotes": "Design System Phase 3: Zero decorative glow halos, honest portfolio data without fake bezier curves, neutral card chrome, inputMode='decimal' for numeric keyboards, explicit id/htmlFor bindings, and tabular pitch.",
   "forceUpdate": false
 }
