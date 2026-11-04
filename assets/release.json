@@ -1,6 +1,6 @@
 {
-  "version": "1.0.25",
-  "sha256": "5e0f9deb664c09f9bd5f14e26aaa468eb17e35aa63e7aac309f3cd4301cf5947",
-  "releaseNotes": "Audit Implementation: P7-01/P7-03 Bot Fleet & Genetic Inspector safety guards and empty state UI; P5-03 Trade execution fail-closed & minNotional verification; P8-05 Payment proof persistence 7/7 test suite. 68 app unit tests pass.",
+  "version": "1.0.26",
+  "sha256": "442118311858dabfa2fed0e04248e54855fc18a1283cc49b3f874ac2b52bb1d6",
+  "releaseNotes": "Design System Audit Remediation: Enforce 48dp stepper & nav touch targets, eliminate fabricated watchlist fallbacks & fake sparkline drop-shadows, add Android safe-area insets, explicit search/profile input a11y labels, and profile save spinner.",
   "forceUpdate": false
 }
