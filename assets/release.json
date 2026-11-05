@@ -1,6 +1,6 @@
 {
-  "version": "1.0.27",
-  "sha256": "0cadbb2279d2588099a0c4174f2f09096f95ffbf5b2c06dc1b0891f757653ce3",
-  "releaseNotes": "Design System Phase 3: Zero decorative glow halos, honest portfolio data without fake bezier curves, neutral card chrome, inputMode='decimal' for numeric keyboards, explicit id/htmlFor bindings, and tabular pitch.",
+  "version": "1.0.28",
+  "sha256": "4c84c85607214a1f3cae2938722afa4e298da7b760c6cc363393c063b96f476b",
+  "releaseNotes": "Fix: Trade and Activity tabs black screen caused by lightweight-charts monotonicity violation; add ErrorBoundary crash recovery; v1.0.28",
   "forceUpdate": false
 }
