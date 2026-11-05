@@ -1,6 +1,6 @@
 {
-  "version": "1.0.28",
-  "sha256": "4c84c85607214a1f3cae2938722afa4e298da7b760c6cc363393c063b96f476b",
-  "releaseNotes": "Fix: Trade and Activity tabs black screen caused by lightweight-charts monotonicity violation; add ErrorBoundary crash recovery; v1.0.28",
+  "version": "1.0.29",
+  "sha256": "f69e3a35581123d64fac89765885a51a274b8afdfae1cdafe7f19cd716d2ef27",
+  "releaseNotes": "Markets screen Canva redesign: dark theme, sortable columns, pill filters, new chip colors; BotsScreen subtitle; Maestro flow fixes; v1.0.29",
   "forceUpdate": false
 }
