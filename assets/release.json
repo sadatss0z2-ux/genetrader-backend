@@ -1,6 +1,6 @@
 {
   "version": "1.0.29",
-  "sha256": "f69e3a35581123d64fac89765885a51a274b8afdfae1cdafe7f19cd716d2ef27",
-  "releaseNotes": "Markets screen Canva redesign: dark theme, sortable columns, pill filters, new chip colors; BotsScreen subtitle; Maestro flow fixes; v1.0.29",
+  "sha256": "94e0dffc2452c8ed068e31751dbdadeea392995c53d46832a465487b42756c2b",
+  "releaseNotes": "Markets screen Canva redesign: flat grid rows, 3-col equal filter pills, 52px chips, sortable columns, border-b separators; v1.0.29",
   "forceUpdate": false
 }
