@@ -1,6 +1,6 @@
 {
   "version": "1.0.29",
-  "sha256": "43e97d91d58e5cb54c55e85fd3c78d5803ca8b29e0e75e1c81a0f183117f9bd5",
-  "releaseNotes": "Trade screen Canva redesign: sticky header with star/bell/share/layout actions, secondary Price|OrderBook|Trades|Info tabs, 2x2 stats grid, multi-period performance strip, Bid/Ask depth balance bar, quick-action bottom dock (Alert, Share, Buy, Sell); v1.0.29",
+  "sha256": "e16943b60ab05d877d69149ad48b4af16d95784290e0539e37d4524585272391",
+  "releaseNotes": "Trade screen Phase 2 fixes: repaired JSX structural errors, order book column header placement, Buy confirmation modal overlay, 0 TSC errors, 69/69 tests; v1.0.29",
   "forceUpdate": false
 }
