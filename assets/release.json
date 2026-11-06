@@ -1,6 +1,6 @@
 {
   "version": "1.0.29",
-  "sha256": "94e0dffc2452c8ed068e31751dbdadeea392995c53d46832a465487b42756c2b",
-  "releaseNotes": "Markets screen Canva redesign: flat grid rows, 3-col equal filter pills, 52px chips, sortable columns, border-b separators; v1.0.29",
+  "sha256": "43e97d91d58e5cb54c55e85fd3c78d5803ca8b29e0e75e1c81a0f183117f9bd5",
+  "releaseNotes": "Trade screen Canva redesign: sticky header with star/bell/share/layout actions, secondary Price|OrderBook|Trades|Info tabs, 2x2 stats grid, multi-period performance strip, Bid/Ask depth balance bar, quick-action bottom dock (Alert, Share, Buy, Sell); v1.0.29",
   "forceUpdate": false
 }
