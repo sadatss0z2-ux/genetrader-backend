@@ -1,6 +1,6 @@
 {
   "version": "1.0.29",
-  "sha256": "83BC9CDC960CA6E3964D49865D07CBB6E4CA4D103222EA9055A2ACD9389E517A",
-  "releaseNotes": "Markets screen Canva redesign: featured cards, animated sparklines, gradient change badges, sortable columns, Favorites pill, all live features connected; BOLL overlay fix in Trade screen; 0 TSC errors, 69/69 tests; v1.0.29",
+  "sha256": "D2B51B285F21192DAD5450C3B47D7FF8507C78DE368918254322C21357CE44EC",
+  "releaseNotes": "Markets screen sizing fix: compact grid layout (no overflow on 360dp), row height 64px, featured cards 138px, filter pills h-7, consistent column widths; 0 TSC errors, 69/69 tests; v1.0.29",
   "forceUpdate": false
 }
