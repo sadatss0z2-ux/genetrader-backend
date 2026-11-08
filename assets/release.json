@@ -1,6 +1,6 @@
 {
   "version": "1.0.29",
-  "sha256": "e16943b60ab05d877d69149ad48b4af16d95784290e0539e37d4524585272391",
-  "releaseNotes": "Trade screen Phase 2 fixes: repaired JSX structural errors, order book column header placement, Buy confirmation modal overlay, 0 TSC errors, 69/69 tests; v1.0.29",
+  "sha256": "83BC9CDC960CA6E3964D49865D07CBB6E4CA4D103222EA9055A2ACD9389E517A",
+  "releaseNotes": "Markets screen Canva redesign: featured cards, animated sparklines, gradient change badges, sortable columns, Favorites pill, all live features connected; BOLL overlay fix in Trade screen; 0 TSC errors, 69/69 tests; v1.0.29",
   "forceUpdate": false
 }
