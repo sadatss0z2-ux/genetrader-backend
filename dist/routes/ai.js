@@ -12,16 +12,20 @@ const NIM_KEYS = [
 
 const OPENROUTER_KEY = process.env.OPENROUTER_API_KEY ?? '';
 
-const SYSTEM_PROMPT =
-    'You are a concise crypto trading assistant for the GeneTrader app. ' +
-    'Answer in 2-3 sentences max. Be direct and practical.';
+const BASE_SYSTEM_PROMPT =
+    'You are a smart crypto trading assistant built into the GeneTrader app — an algorithmic trading platform. ' +
+    'You have access to the user\'s live account context below. Use it to give specific, accurate answers. ' +
+    'Be concise (2-4 sentences). Be direct and practical. Never make up numbers — only use the data provided.';
 
-async function callLlm(question) {
+async function callLlm(question, context) {
     const isNim = NIM_KEYS.length > 0;
     const keys = isNim ? NIM_KEYS : (OPENROUTER_KEY ? [OPENROUTER_KEY] : []);
     if (keys.length === 0) {
-        return 'AI assistant is not configured on the server. Contact support.';
+        return 'AI assistant is not configured. Contact support.';
     }
+    const systemPrompt = context
+        ? `${BASE_SYSTEM_PROMPT}\n\n${context}`
+        : BASE_SYSTEM_PROMPT;
     for (let i = 0; i < keys.length; i++) {
         try {
             const res = await fetch(
@@ -38,11 +42,11 @@ async function callLlm(question) {
                     body: JSON.stringify({
                         model: isNim ? 'nvidia/nemotron-3.5-bolt-e4b' : 'mistralai/mistral-7b-instruct:free',
                         messages: [
-                            { role: 'system', content: SYSTEM_PROMPT },
+                            { role: 'system', content: systemPrompt },
                             { role: 'user', content: question },
                         ],
-                        max_tokens: 150,
-                        temperature: 0.6,
+                        max_tokens: 180,
+                        temperature: 0.5,
                         top_p: 0.9,
                     }),
                     signal: AbortSignal.timeout(15000),
@@ -67,6 +71,11 @@ router.post(
         .trim()
         .isLength({ min: 1, max: 500 })
         .withMessage('question must be 1-500 characters'),
+    (0, express_validator_1.body)('context')
+        .optional()
+        .isString()
+        .isLength({ max: 2000 })
+        .withMessage('context must be a string under 2000 characters'),
     async (req, res, next) => {
         const errors = (0, express_validator_1.validationResult)(req);
         if (!errors.isEmpty()) {
@@ -74,8 +83,8 @@ router.post(
             return;
         }
         try {
-            const { question } = req.body;
-            const reply = await callLlm(question);
+            const { question, context } = req.body;
+            const reply = await callLlm(question, context);
             res.json({ reply });
         } catch (err) {
             next(err);
