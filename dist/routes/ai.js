@@ -36,7 +36,7 @@ async function callLlm(question) {
                         ...(isNim ? {} : { 'HTTP-Referer': 'https://genetrader.app', 'X-Title': 'GeneTrader' }),
                     },
                     body: JSON.stringify({
-                        model: isNim ? 'meta/llama-3.1-8b-instruct' : 'mistralai/mistral-7b-instruct:free',
+                        model: isNim ? 'nvidia/nemotron-3.5-bolt-e4b' : 'mistralai/mistral-7b-instruct:free',
                         messages: [
                             { role: 'system', content: SYSTEM_PROMPT },
                             { role: 'user', content: question },
