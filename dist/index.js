@@ -73,6 +73,7 @@ const tradingPolicyService_1 = require("./services/tradingPolicyService");
 const decisions_1 = __importDefault(require("./routes/decisions"));
 const environment_1 = __importDefault(require("./routes/environment"));
 const appUpdates_1 = __importDefault(require("./routes/appUpdates"));
+const ai_1 = __importDefault(require("./routes/ai"));
 const public_1 = __importDefault(require("./routes/public"));
 const entitlementService_1 = require("./services/entitlementService");
 const metrics_1 = require("./config/metrics");
@@ -208,6 +209,7 @@ app.use('/api/price-alerts', (0, priceAlerts_1.createPriceAlertsRouter)(priceAle
 app.use('/api/decisions', decisions_1.default);
 app.use('/api/environment', environment_1.default);
 app.use('/api/app-updates', appUpdates_1.default);
+app.use('/api/ai', ai_1.default);
 app.use('/v1', entitlements_1.default);
 app.use('/internal/v1/copier/events', copierEvents_1.default);
 app.use('/internal/v1/copier', copierControl_1.default);
