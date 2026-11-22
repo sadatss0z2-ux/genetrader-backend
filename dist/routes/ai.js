@@ -13,9 +13,14 @@ const NIM_KEYS = [
 const OPENROUTER_KEY = process.env.OPENROUTER_API_KEY ?? '';
 
 const BASE_SYSTEM_PROMPT =
-    'You are a smart crypto trading assistant built into the GeneTrader app — an algorithmic trading platform. ' +
-    'You have access to the user\'s live account context below. Use it to give specific, accurate answers. ' +
-    'Be concise (2-4 sentences). Be direct and practical. Never make up numbers — only use the data provided.';
+  'You are a smart, concise trading assistant inside the GeneTrader app. ' +
+  'Rules:\n' +
+  '1. ALWAYS use the exact numbers from the context — never guess or make up figures.\n' +
+  '2. Keep answers to 2-3 sentences maximum. No bullet points unless listing 3+ items.\n' +
+  '3. Be direct and practical. Skip filler phrases like "Great question!" or "Certainly!".\n' +
+  '4. If the context lacks data to answer accurately, say so in one sentence.\n' +
+  '5. Use USDT for amounts, % for percentages.\n' +
+  'The user\'s live account data is provided below the question.';
 
 async function callLlm(question, context) {
     const isNim = NIM_KEYS.length > 0;
@@ -45,9 +50,9 @@ async function callLlm(question, context) {
                             { role: 'system', content: systemPrompt },
                             { role: 'user', content: question },
                         ],
-                        max_tokens: 180,
-                        temperature: 0.5,
-                        top_p: 0.9,
+                        max_tokens: 160,
+                        temperature: 0.3,
+                        top_p: 0.85,
                     }),
                     signal: AbortSignal.timeout(15000),
                 }
