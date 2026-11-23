@@ -8,6 +8,8 @@ export declare const apiLimiter: import("express-rate-limit").RateLimitRequestHa
 export declare const clickLimiter: import("express-rate-limit").RateLimitRequestHandler;
 /** Trading limiter (prevents excessive trading). */
 export declare const tradingLimiter: import("express-rate-limit").RateLimitRequestHandler;
+/** Cost-protect the AI proxy independently from the broader API limit. */
+export declare const aiLimiter: import("express-rate-limit").RateLimitRequestHandler;
 /** Isolated rate cap for the authenticated copier control plane. */
 export declare const copierLimiter: import("express-rate-limit").RateLimitRequestHandler;
 //# sourceMappingURL=rateLimiter.d.ts.map

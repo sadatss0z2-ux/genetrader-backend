@@ -18,6 +18,12 @@ services:
         sync: false
       - key: RESEND_API_KEY
         sync: false
+      # Gemini remains server-side. When present, the API prefers it and
+      # falls back to the existing compatible provider only when unavailable.
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.5-flash-lite
       - key: EMAIL_FROM
         sync: false
       - key: FIREBASE_PROJECT_ID

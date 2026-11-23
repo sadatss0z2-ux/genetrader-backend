@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.copierLimiter = exports.tradingLimiter = exports.clickLimiter = exports.apiLimiter = exports.passwordResetLimiter = exports.authLimiter = void 0;
+exports.copierLimiter = exports.aiLimiter = exports.tradingLimiter = exports.clickLimiter = exports.apiLimiter = exports.passwordResetLimiter = exports.authLimiter = void 0;
 const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const validate = { xForwardedForHeader: false };
 /** Strict limiter for auth endpoints (prevents brute-force). */
@@ -49,6 +49,15 @@ exports.tradingLimiter = (0, express_rate_limit_1.default)({
     standardHeaders: true,
     legacyHeaders: false,
     message: { error: 'Too many trading requests, please slow down.' },
+    validate,
+});
+/** Cost-protect the AI proxy independently from the broader API limit. */
+exports.aiLimiter = (0, express_rate_limit_1.default)({
+    windowMs: 60 * 1000,
+    max: 20,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: 'AI request limit reached. Please wait a moment before trying again.', code: 'rate_limited' },
     validate,
 });
 /** Isolated rate cap for the authenticated copier control plane. */

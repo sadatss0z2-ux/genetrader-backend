@@ -1,3 +1,3 @@
-import { Router } from 'express';
-declare const router: Router;
+declare const router: import("express-serve-static-core").Router;
 export default router;
+//# sourceMappingURL=ai.d.ts.map
