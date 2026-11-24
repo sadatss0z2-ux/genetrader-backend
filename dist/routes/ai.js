@@ -45,7 +45,7 @@ function isContextObject(value) {
 function serializeContext(value) {
     if (typeof value === 'string')
         return sanitizeReference(value, 8_000);
-    if (!isContextObject(value))
+    if (!Array.isArray(value) && !isContextObject(value))
         return '';
     const serialized = JSON.stringify(value, (_key, nestedValue) => {
         if (typeof nestedValue === 'string')

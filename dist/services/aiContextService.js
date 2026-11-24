@@ -110,8 +110,20 @@ function toQuoteMap(symbols, results) {
     });
     return quoteBySymbol;
 }
+async function getPublicSpotTicker(symbol) {
+    const response = await fetch(`https://data-api.binance.vision/api/v3/ticker/24hr?symbol=${encodeURIComponent(symbol)}`, { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(3_500) });
+    if (!response.ok)
+        throw new Error(`Binance public ticker HTTP ${response.status}`);
+    const data = await response.json();
+    const price = safeNumber(data.lastPrice);
+    const priceChangePercent = safeNumber(data.priceChangePercent);
+    if (price === undefined || price <= 0 || priceChangePercent === undefined) {
+        throw new Error('Binance returned an invalid public ticker quote.');
+    }
+    return { price, priceChangePercent };
+}
 async function fetchQuoteResults(symbols) {
-    return Promise.allSettled(symbols.map((symbol) => (0, binanceService_1.get24hTicker)(symbol)));
+    return Promise.allSettled(symbols.map((symbol) => getPublicSpotTicker(symbol)));
 }
 async function getPersonalContext(userId, baseSymbols, baseQuoteResults) {
     const [connectionResult, accountResult, ordersResult, riskSettingsResult] = await Promise.allSettled([
