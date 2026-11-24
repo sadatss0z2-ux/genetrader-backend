@@ -45,6 +45,19 @@ function requestedSymbols(question) {
     }
     return [...symbols].slice(0, 12);
 }
+function focusSymbols(question, fetchedSymbols) {
+    const lower = question.toLowerCase();
+    const mentioned = fetchedSymbols.filter((symbol) => {
+        const base = symbol.replace(/USDT$/, '');
+        if (new RegExp(`\\b${base.toLowerCase()}\\b|\\b${symbol.toLowerCase()}\\b`, 'i').test(lower))
+            return true;
+        return ASSET_ALIASES.some(([aliases, pair]) => pair === symbol && aliases.some((alias) => {
+            const escaped = alias.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+');
+            return new RegExp(`(?:^|[^a-z0-9])${escaped}(?:$|[^a-z0-9])`, 'i').test(lower);
+        }));
+    });
+    return mentioned.length ? mentioned : CORE_SYMBOLS.filter((symbol) => fetchedSymbols.includes(symbol));
+}
 function safeNumber(value) {
     if (value === null || value === undefined || value === '')
         return undefined;
@@ -210,11 +223,18 @@ async function buildAiContext(userId, question, appMode = 'personal') {
             return [];
         return [{ symbol, priceUsdt: quote.price, change24hPct: quote.change, source: 'Binance Spot', observedAt: marketObservedAt }];
     });
+    const focusedSymbols = focusSymbols(question, symbols);
+    const focusedQuotes = focusedSymbols.filter((symbol) => quoteBySymbol.has(symbol)).length;
+    const marketStatus = focusedQuotes === 0
+        ? 'unavailable'
+        : focusedQuotes < focusedSymbols.length
+            ? 'partially_available'
+            : 'available';
     return {
         generatedAt,
         appMode,
         market: {
-            status: quotes.length === 0 ? 'unavailable' : quotes.length < symbols.length ? 'partially_available' : 'available',
+            status: marketStatus,
             source: 'Binance Spot',
             observedAt: marketObservedAt,
             quotes,
