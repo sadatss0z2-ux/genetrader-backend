@@ -1,0 +1,1 @@
+{"version":3,"file":"cryptoNewsService.d.ts","sourceRoot":"","sources":["../../src/services/cryptoNewsService.ts"],"names":[],"mappings":"AAAA,MAAM,WAAW,cAAc;IAC7B,KAAK,EAAE,MAAM,CAAC;IACd,GAAG,EAAE,MAAM,CAAC;IACZ,MAAM,EAAE,MAAM,CAAC;IACf,WAAW,EAAE,MAAM,CAAC;IACpB,OAAO,CAAC,EAAE,MAAM,CAAC;CAClB;AAqFD;;;GAGG;AACH,wBAAsB,mBAAmB,IAAI,OAAO,CAAC,cAAc,EAAE,CAAC,CASrE"}
