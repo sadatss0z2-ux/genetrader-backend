@@ -39,8 +39,9 @@ function requestedSymbols(question) {
     }
     for (const match of question.matchAll(/\b([A-Z0-9]{2,12})(?:USDT|USDC|USD)?\b/g)) {
         const asset = match[1]?.toUpperCase().replace(/(?:USDT|USDC|USD)$/, '');
-        if (asset && !NON_TICKER_WORDS.has(asset) && !STABLE_ASSETS.has(asset))
+        if (asset && !/^\d+$/.test(asset) && !NON_TICKER_WORDS.has(asset) && !STABLE_ASSETS.has(asset)) {
             symbols.add(`${asset}USDT`);
+        }
     }
     return [...symbols].slice(0, 12);
 }
