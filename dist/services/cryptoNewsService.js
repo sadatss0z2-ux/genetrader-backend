@@ -58,7 +58,10 @@ function parseFeed(xml, source, now) {
             continue;
         }
         const summary = readTag(item, 'description') || readTag(item, 'summary') || readTag(item, 'content');
-        if (!CRYPTO_NEWS_RELEVANCE.test(`${title} ${summary}`))
+        // Feeds can include tech and general finance posts whose descriptions
+        // happen to mention crypto in passing. Keep AI news answers on-topic by
+        // requiring the headline itself to identify a crypto asset or topic.
+        if (!CRYPTO_NEWS_RELEVANCE.test(title))
             continue;
         items.push({
             title,
