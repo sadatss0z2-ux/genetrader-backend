@@ -112,7 +112,7 @@ async function callGemini(systemPrompt, question, history) {
                     topP: 0.85,
                 },
             }),
-            signal: AbortSignal.timeout(15_000),
+            signal: AbortSignal.timeout(25_000),
         });
         if (!res.ok)
             throw new Error(`Gemini HTTP ${res.status}`);
@@ -158,7 +158,7 @@ async function callOpenAiCompatible(provider, systemPrompt, question, history) {
                     temperature: 0.2,
                     top_p: 0.85,
                 }),
-                signal: AbortSignal.timeout(15_000),
+                signal: AbortSignal.timeout(25_000),
             });
             if (res.status === 429 && i < keys.length - 1)
                 continue;
@@ -181,8 +181,17 @@ async function callLlm(question, context, news, newsRequested, history = []) {
         return { reply: 'The AI assistant is not configured. Contact support.', error: 'unconfigured' };
     }
     const systemPrompt = buildSystemPrompt(context, news, newsRequested);
-    if (provider === 'gemini')
-        return callGemini(systemPrompt, question, history);
+    if (provider === 'gemini') {
+        const primary = await callGemini(systemPrompt, question, history);
+        if (!primary.error || REQUESTED_PROVIDER)
+            return primary;
+        const fallback = ['nim', 'openrouter'].find((candidate) => {
+            if (candidate === 'nim')
+                return NIM_KEYS.length > 0;
+            return Boolean(OPENROUTER_KEY);
+        });
+        return fallback ? callOpenAiCompatible(fallback, systemPrompt, question, history) : primary;
+    }
     return callOpenAiCompatible(provider, systemPrompt, question, history);
 }
 router.post('/chat', rateLimiter_1.aiLimiter, auth_1.optionalAuth, (0, express_validator_1.body)('question')
