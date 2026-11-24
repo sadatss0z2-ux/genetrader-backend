@@ -7,6 +7,7 @@ const FEEDS = [
 ];
 const MAX_FEED_BYTES = 500_000;
 const MAX_AGE_MS = 36 * 60 * 60 * 1000;
+const CRYPTO_NEWS_RELEVANCE = /\b(?:crypto|cryptocurrenc(?:y|ies)|bitcoin|btc|ethereum|ether|eth|solana|sol|xrp|ripple|bnb|binance|coinbase|blockchain|token|defi|web3|stablecoin|altcoin|nft|cftc|sec|etf|exchange|on-chain|wallet|mining|hashrate)\b/i;
 function decodeXml(value) {
     return value
         .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
@@ -57,6 +58,8 @@ function parseFeed(xml, source, now) {
             continue;
         }
         const summary = readTag(item, 'description') || readTag(item, 'summary') || readTag(item, 'content');
+        if (!CRYPTO_NEWS_RELEVANCE.test(`${title} ${summary}`))
+            continue;
         items.push({
             title,
             url,
