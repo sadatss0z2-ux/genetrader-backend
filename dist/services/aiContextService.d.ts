@@ -2,7 +2,7 @@ export interface AiMarketQuote {
     symbol: string;
     priceUsdt: number;
     change24hPct: number;
-    source: 'Binance Spot';
+    source: 'Binance Spot live stream' | 'Binance Spot REST fallback';
     observedAt: string;
 }
 export interface AiPersonalContext {
@@ -40,11 +40,11 @@ export interface AiContextSnapshot {
     appMode: 'personal' | 'demo';
     market: {
         status: 'available' | 'partially_available' | 'unavailable';
-        source: 'Binance Spot';
+        source: string;
         observedAt: string;
         quotes: AiMarketQuote[];
     };
     personal?: AiPersonalContext;
 }
-export declare function buildAiContext(userId: number | undefined, question: string, appMode?: 'personal' | 'demo'): Promise<AiContextSnapshot>;
+export declare function buildAiContext(userId: number | undefined, question: string, appMode?: 'personal' | 'demo', preferredAssets?: string[]): Promise<AiContextSnapshot>;
 //# sourceMappingURL=aiContextService.d.ts.map

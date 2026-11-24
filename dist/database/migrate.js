@@ -11,7 +11,7 @@ const node_crypto_1 = require("node:crypto");
 const postgres_1 = __importDefault(require("postgres"));
 const dotenv_1 = require("dotenv");
 (0, dotenv_1.config)({ path: (0, node_path_1.join)(process.cwd(), '.env') });
-const databaseUrl = process.env.DATABASE_URL_UNPOOLED || process.env.DATABASE_URL;
+const databaseUrl = process.env.GT_DATABASE_URL_UNPOOLED || process.env.DATABASE_URL_UNPOOLED || process.env.GT_DATABASE_URL || process.env.DATABASE_URL;
 if (!databaseUrl)
     throw new Error('DATABASE_URL_UNPOOLED or DATABASE_URL is required to run migrations.');
 const databaseHost = new URL(databaseUrl).hostname;
@@ -112,7 +112,15 @@ async function applyDown(tx, migration) {
 async function run() {
     const direction = process.argv.includes('--down') ? 'down' : 'up';
     try {
-        const migrations = await discoverMigrations();
+        const discoveredMigrations = await discoverMigrations();
+        const onlyArgument = process.argv.find((argument) => argument.startsWith('--only='));
+        const onlyId = onlyArgument?.slice('--only='.length);
+        const migrations = onlyId
+            ? discoveredMigrations.filter((migration) => migration.id === onlyId)
+            : discoveredMigrations;
+        if (onlyId && migrations.length !== 1) {
+            throw new Error(`Expected one migration with id ${onlyId}, found ${migrations.length}.`);
+        }
         await sql.begin(async (tx) => {
             await tx `SELECT pg_advisory_xact_lock(20260930, 2048)`;
             // Create or upgrade migration journal table

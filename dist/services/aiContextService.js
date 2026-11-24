@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.buildAiContext = buildAiContext;
 const database_1 = __importDefault(require("../config/database"));
 const binanceService_1 = require("./binanceService");
+const market_1 = require("../routes/market");
 const CORE_SYMBOLS = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT'];
 const STABLE_ASSETS = new Set(['USDT', 'USDC', 'FDUSD', 'BUSD', 'TUSD', 'USDP', 'DAI']);
 const NON_TICKER_WORDS = new Set(['AI', 'API', 'BUY', 'SELL', 'HOLD', 'HOW', 'WHAT', 'WHEN', 'WHERE', 'WHY', 'WHO', 'MY', 'ME', 'THE', 'AND', 'FOR', 'WITH', 'FROM', 'PRICE', 'MARKET', 'NEWS', 'TODAY', 'LATEST', 'CURRENT', 'USDT', 'USDC', 'USD', 'PNL', 'ROI']);
@@ -26,7 +27,7 @@ const ASSET_ALIASES = [
     [['toncoin', 'ton'], 'TONUSDT'],
     [['sui'], 'SUIUSDT'],
 ];
-function requestedSymbols(question) {
+function requestedSymbols(question, preferredAssets = []) {
     const lower = question.toLowerCase();
     const symbols = new Set(CORE_SYMBOLS);
     for (const [aliases, pair] of ASSET_ALIASES) {
@@ -41,6 +42,13 @@ function requestedSymbols(question) {
         const asset = match[1]?.toUpperCase().replace(/(?:USDT|USDC|USD)$/, '');
         if (asset && !/^\d+$/.test(asset) && !NON_TICKER_WORDS.has(asset) && !STABLE_ASSETS.has(asset)) {
             symbols.add(`${asset}USDT`);
+        }
+    }
+    for (const rawAsset of preferredAssets) {
+        const asset = rawAsset.trim().toUpperCase();
+        const normalized = /(?:USDT|USDC|USD)$/.test(asset) ? asset.replace(/(?:USDT|USDC|USD)$/, '') : asset;
+        if (/^[A-Z0-9]{2,12}$/.test(normalized) && !STABLE_ASSETS.has(normalized)) {
+            symbols.add(`${normalized}USDT`);
         }
     }
     return [...symbols].slice(0, 12);
@@ -119,12 +127,36 @@ function toQuoteMap(symbols, results) {
         const price = safeNumber(result.value.price);
         const change = safeNumber(result.value.priceChangePercent);
         if (price !== undefined && price > 0 && change !== undefined) {
-            quoteBySymbol.set(symbols[index], { price, change });
+            quoteBySymbol.set(symbols[index], {
+                priceUsdt: price,
+                change24hPct: change,
+                source: result.value.source,
+                observedAt: result.value.observedAt,
+            });
         }
     });
     return quoteBySymbol;
 }
+function getFreshStreamingTicker(symbol) {
+    const event = market_1.marketDataService.getLatestEvent(symbol, 'ticker');
+    if (!event || event.channel !== 'ticker' || event.stale || Date.now() - event.receivedTime > 15_000) {
+        return undefined;
+    }
+    const price = safeNumber(event.lastPrice);
+    const priceChangePercent = safeNumber(event.priceChangePercent24h);
+    if (price === undefined || price <= 0 || priceChangePercent === undefined)
+        return undefined;
+    return {
+        price,
+        priceChangePercent,
+        source: 'Binance Spot live stream',
+        observedAt: new Date(event.receivedTime).toISOString(),
+    };
+}
 async function getPublicSpotTicker(symbol) {
+    const liveQuote = getFreshStreamingTicker(symbol);
+    if (liveQuote)
+        return liveQuote;
     const response = await fetch(`https://data-api.binance.vision/api/v3/ticker/24hr?symbol=${encodeURIComponent(symbol)}`, { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(3_500) });
     if (!response.ok)
         throw new Error(`Binance public ticker HTTP ${response.status}`);
@@ -134,7 +166,12 @@ async function getPublicSpotTicker(symbol) {
     if (price === undefined || price <= 0 || priceChangePercent === undefined) {
         throw new Error('Binance returned an invalid public ticker quote.');
     }
-    return { price, priceChangePercent };
+    return {
+        price,
+        priceChangePercent,
+        source: 'Binance Spot REST fallback',
+        observedAt: new Date().toISOString(),
+    };
 }
 async function fetchQuoteResults(symbols) {
     return Promise.allSettled(symbols.map((symbol) => getPublicSpotTicker(symbol)));
@@ -184,7 +221,7 @@ async function getPersonalContext(userId, baseSymbols, baseQuoteResults) {
         .map(({ asset, quantity }) => {
         if (asset === 'USDT')
             return { asset, quantity, priceUsdt: 1, valueUsdt: quantity };
-        const priceUsdt = quoteBySymbol.get(`${asset}USDT`)?.price;
+        const priceUsdt = quoteBySymbol.get(`${asset}USDT`)?.priceUsdt;
         return {
             asset,
             quantity,
@@ -207,22 +244,24 @@ async function getPersonalContext(userId, baseSymbols, baseQuoteResults) {
         recentOrders: ordersResult.status === 'fulfilled' ? ordersResult.value : [],
     };
 }
-async function buildAiContext(userId, question, appMode = 'personal') {
+async function buildAiContext(userId, question, appMode = 'personal', preferredAssets = []) {
     const generatedAt = new Date().toISOString();
-    const symbols = requestedSymbols(question);
+    const symbols = requestedSymbols(question, preferredAssets);
     const quoteResultsPromise = fetchQuoteResults(symbols);
     const personalPromise = userId
         ? getPersonalContext(userId, symbols, quoteResultsPromise)
         : Promise.resolve(undefined);
     const [marketResults, personal] = await Promise.all([quoteResultsPromise, personalPromise]);
-    const marketObservedAt = new Date().toISOString();
     const quoteBySymbol = toQuoteMap(symbols, marketResults);
     const quotes = symbols.flatMap((symbol) => {
         const quote = quoteBySymbol.get(symbol);
         if (!quote)
             return [];
-        return [{ symbol, priceUsdt: quote.price, change24hPct: quote.change, source: 'Binance Spot', observedAt: marketObservedAt }];
+        return [{ symbol, ...quote }];
     });
+    const marketObservedAt = quotes.length
+        ? quotes.reduce((oldest, quote) => quote.observedAt < oldest ? quote.observedAt : oldest, quotes[0].observedAt)
+        : generatedAt;
     const focusedSymbols = focusSymbols(question, symbols);
     const focusedQuotes = focusedSymbols.filter((symbol) => quoteBySymbol.has(symbol)).length;
     const marketStatus = focusedQuotes === 0
@@ -230,12 +269,18 @@ async function buildAiContext(userId, question, appMode = 'personal') {
         : focusedQuotes < focusedSymbols.length
             ? 'partially_available'
             : 'available';
+    const focusedSources = [...new Set(quotes
+            .filter((quote) => focusedSymbols.includes(quote.symbol))
+            .map((quote) => quote.source))];
+    const marketSource = focusedSources.length > 1
+        ? 'Binance Spot live stream + REST fallback'
+        : focusedSources[0] ?? 'Binance Spot';
     return {
         generatedAt,
         appMode,
         market: {
             status: marketStatus,
-            source: 'Binance Spot',
+            source: marketSource,
             observedAt: marketObservedAt,
             quotes,
         },
